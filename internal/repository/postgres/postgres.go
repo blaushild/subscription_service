@@ -14,6 +14,8 @@ import (
 	_ "github.com/lib/pq"
 )
 
+var ErrIDNotFound = fmt.Errorf("id not found")
+
 type Repository struct {
 	db *sqlx.DB
 }
@@ -86,7 +88,7 @@ func (r *Repository) GetRecordByID(id uuid.UUID) (*entity.Subscription, error) {
 	err := r.db.Get(&resp, q, id)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, fmt.Errorf("subscription with id %s not found", id)
+			return nil, fmt.Errorf("subscription id %s not found", id)
 		}
 		return nil, fmt.Errorf("getting of record %s error: %w", id, err)
 	}
@@ -124,10 +126,20 @@ func (r *Repository) Update(sub *entity.Subscription) (*entity.Subscription, err
 func (r *Repository) Delete(id uuid.UUID) error {
 	q := `DELETE FROM subscriptions WHERE id = $1`
 
-	_, err := r.db.Exec(q, id)
+	result, err := r.db.Exec(q, id)
 	if err != nil {
-		return fmt.Errorf("db Delete('%s') error: %w", id, err)
+		log.Printf("Can't delete record %s. error: %s", id, err)
+		return fmt.Errorf("delete record %s error: %w", id, err)
 	}
+
+	if rowsAffected, err := result.RowsAffected(); rowsAffected == 0 {
+		log.Println("no records found for delete")
+		return ErrIDNotFound
+	} else if err != nil {
+		log.Printf("Can't delete record %s. error: %s", id, err)
+		return fmt.Errorf("delete record %s error: %w", id, err)
+	}
+
 	return nil
 }
 

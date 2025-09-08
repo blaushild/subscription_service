@@ -10,7 +10,7 @@ func setupRouter(r chi.Router, c Controller) {
 		r.Post("/api/v1/subscription", c.Create)
 		r.Get("/api/v1/subscription/{id}", c.GetRecordByID)
 		r.Put("/api/v1/subscription", c.Update)
-		r.Delete("/api/v1/subscription", c.Delete)
+		r.Delete("/api/v1/subscription/{id}", c.Delete)
 		r.Get("/api/v1/subscription", c.List)
 		r.Get("/api/v1/subscription/user/{id}/total", c.GetTotal)
 	})

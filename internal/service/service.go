@@ -29,18 +29,6 @@ func NewService(cfg *config.Config) *service {
 }
 func (s *service) Create(req *entity.CreateRequest) (*entity.Subscription, error) {
 	return s.repo.Add(req)
-	// if err != nil {
-	// 	return nil, err
-	// }
-
-	// return &entity.Subscription{
-	// 	ID:          resp.ID,
-	// 	UserID:      req.UserID,
-	// 	StartDate:   req.StartDate,
-	// 	FinishDate:  req.FinishDate,
-	// 	ServiceName: req.ServiceName,
-	// 	Price:       req.Price,
-	// }, nil
 }
 
 func (s *service) GetRecordByID(id uuid.UUID) (*entity.Subscription, error) {

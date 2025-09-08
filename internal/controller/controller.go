@@ -2,10 +2,13 @@ package controller
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"subscribe_service/internal/config"
 	"subscribe_service/internal/entity"
+	repository "subscribe_service/internal/repository/postgres"
 	"subscribe_service/internal/service"
 
 	"log"
@@ -129,7 +132,28 @@ func (c *controller) Update(w http.ResponseWriter, r *http.Request) {
 	w.Write(jsonResp)
 }
 
-func (c *controller) Delete(w http.ResponseWriter, r *http.Request) {}
+func (c *controller) Delete(w http.ResponseWriter, r *http.Request) {
+	idStr := chi.URLParam(r, "id")
+	id, err := uuid.Parse(idStr)
+	if err != nil {
+		http.Error(w, "Invalid ID format", http.StatusBadRequest)
+		return
+	}
+
+	err = c.service.Delete(id)
+	if err != nil {
+		if errors.Is(err, repository.ErrIDNotFound) {
+			log.Printf("%s %s\n", err, id)
+			http.Error(w, fmt.Sprintf("Failed to delete record. %s: %s", err, id), http.StatusBadRequest)
+			return
+		}
+		log.Printf("failed to delete record: %s\n", err)
+		http.Error(w, "Failed to delete record", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
 
 func (c *controller) List(w http.ResponseWriter, r *http.Request) {
 	resp, err := c.service.GetList()
