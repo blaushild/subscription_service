@@ -104,7 +104,16 @@ func (r *Repository) Update(sub *entity.Subscription) (*entity.Subscription, err
 			price = :Price
 		WHERE id = :ID`
 
-	_, err := r.db.NamedExec(q, sub)
+	params := map[string]any{
+		"ID":          sub.ID,
+		"UserID":      sub.UserID,
+		"StartDate":   sub.StartDate,
+		"FinishDate":  sub.FinishDate,
+		"ServiceName": sub.ServiceName,
+		"Price":       sub.Price,
+	}
+
+	_, err := r.db.NamedExec(q, params)
 	if err != nil {
 		return nil, fmt.Errorf("update subscription %s error: %w", sub.ID, err)
 	}

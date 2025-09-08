@@ -94,7 +94,40 @@ func (c *controller) GetRecordByID(w http.ResponseWriter, r *http.Request) {
 	w.Write(data)
 }
 
-func (c *controller) Update(w http.ResponseWriter, r *http.Request) {}
+func (c *controller) Update(w http.ResponseWriter, r *http.Request) {
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		log.Println("read request body error:", err)
+		http.Error(w, "can't read body", http.StatusBadRequest)
+		return
+	}
+	defer r.Body.Close()
+
+	var req entity.Subscription
+	if err := json.Unmarshal(body, &req); err != nil {
+		log.Println("unmarshalling error:", err)
+		http.Error(w, "can't unmarshal body", http.StatusBadRequest)
+		return
+	}
+
+	resp, err := c.service.Update(&req)
+	if err != nil {
+		log.Println("create subscription error:", err)
+		http.Error(w, "can't create subscription", http.StatusInternalServerError)
+		return
+	}
+
+	jsonResp, err := json.Marshal(resp)
+	if err != nil {
+		log.Println("marshalling response error:", err)
+		http.Error(w, "can't marshal response", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json;charset=utf-8")
+	w.WriteHeader(http.StatusOK)
+	w.Write(jsonResp)
+}
 
 func (c *controller) Delete(w http.ResponseWriter, r *http.Request) {}
 
