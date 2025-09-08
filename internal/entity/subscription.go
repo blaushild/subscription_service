@@ -85,10 +85,10 @@ type CreateRequest struct {
 }
 
 type TotalRequest struct {
-	UserID      uuid.UUID
-	ServiceName string
-	StartDate   *CustomDate
-	FinishDate  *CustomDate
+	UserID      uuid.UUID   `json:"user_id" db:"user_id"`
+	ServiceName string      `json:"service_name" db:"service_name"`
+	StartDate   *CustomDate `json:"start_date" db:"start_date"`
+	FinishDate  *CustomDate `json:"finish_date,omitempty" db:"finish_date"`
 }
 
 type TotalResponse struct {

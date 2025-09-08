@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"strings"
 	"subscribe_service/internal/config"
 	"subscribe_service/internal/entity"
 	"time"
@@ -38,7 +39,8 @@ func NewRepository(cfg *config.Config) *Repository {
 	    price INTEGER NOT NULL CHECK (price >= 0),
 
 		CONSTRAINT valid_date_range CHECK (finish_date IS NULL OR finish_date >= start_date)
-	);`
+	);
+	`
 	_, err = db.Exec(schema)
 	if err != nil {
 		log.Fatal("creating table error: ", err)
@@ -146,6 +148,7 @@ func (r *Repository) Delete(id uuid.UUID) error {
 func (r *Repository) List() (*entity.SubscriptionsResponse, error) {
 	q := `SELECT id, user_id, start_date, finish_date, service_name, price
 			FROM subscriptions`
+
 	rows, err := r.db.Query(q)
 	if err != nil {
 		return nil, fmt.Errorf("db List error: %w", err)
@@ -167,25 +170,46 @@ func (r *Repository) List() (*entity.SubscriptionsResponse, error) {
 }
 
 func (r *Repository) GetTotal(req *entity.TotalRequest) (*entity.TotalResponse, error) {
-	q := `SELECT SUM(price) AS total, COUNT(id) AS count 
-			FROM subscriptions
-			WHERE user_id = :UserID AND service_name = :ServiceName`
+	baseQuery := `SELECT COALESCE(SUM(price), 0) AS total, COUNT(id) AS count 
+			FROM subscriptions`
 
-	rows, err := r.db.NamedQuery(q, req)
-	if err != nil {
-		return nil, fmt.Errorf("db List request error: %w", err)
+	whereConditions := []string{"user_id = $1"}
+	args := []any{req.UserID}
+	paramCount := 1 // Start with 1 parameter for user_id
+
+	if req.ServiceName != "" {
+		paramCount++
+		whereConditions = append(whereConditions, fmt.Sprintf("service_name = $%d", paramCount))
+		args = append(args, req.ServiceName)
 	}
-	defer rows.Close()
+
+	if req.StartDate != nil && !time.Time(*req.StartDate).IsZero() {
+		paramCount++
+		whereConditions = append(whereConditions, fmt.Sprintf("start_date >= $%d", paramCount))
+		args = append(args, time.Time(*req.StartDate))
+	}
+
+	if req.FinishDate != nil && !time.Time(*req.FinishDate).IsZero() {
+		paramCount++
+		whereConditions = append(whereConditions, fmt.Sprintf("finish_date <= $%d", paramCount))
+		args = append(args, time.Time(*req.FinishDate))
+	}
+
+	finalQuery := baseQuery + " WHERE " + strings.Join(whereConditions, " AND ")
+
+	log.Println("finalQuery", finalQuery, req.FinishDate)
 
 	var resp entity.TotalResponse
-	if rows.Next() {
-		err = rows.Scan(&resp.Total, &resp.Count)
-		if err != nil {
-			return nil, fmt.Errorf("scanning id error: %w", err)
-		}
-	} else {
-		return nil, fmt.Errorf("no rows returned from insert")
+	err := r.db.Get(&resp, finalQuery, args...)
+	if err != nil {
+		log.Printf("db GetTotal query error: %s\n", err)
+		return nil, fmt.Errorf("db GetTotal query error: %w", err)
 	}
+
+	resp.UserID = req.UserID
+	resp.ServiceName = req.ServiceName
+
+	log.Println("resp:", resp)
 
 	return &resp, nil
 }

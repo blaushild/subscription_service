@@ -171,4 +171,37 @@ func (c *controller) List(w http.ResponseWriter, r *http.Request) {
 	w.Write(data)
 }
 
-func (c *controller) GetTotal(w http.ResponseWriter, r *http.Request) {}
+func (c *controller) GetTotal(w http.ResponseWriter, r *http.Request) {
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		log.Println("read request body error:", err)
+		http.Error(w, "can't read body", http.StatusBadRequest)
+		return
+	}
+	defer r.Body.Close()
+
+	var req entity.TotalRequest
+	if err := json.Unmarshal(body, &req); err != nil {
+		log.Println("unmarshalling error:", err)
+		http.Error(w, "can't unmarshal body", http.StatusBadRequest)
+		return
+	}
+
+	resp, err := c.service.GetTotal(&req)
+	if err != nil {
+		log.Println("getting total error:", err)
+		http.Error(w, "can't get total", http.StatusInternalServerError)
+		return
+	}
+
+	jsonResp, err := json.Marshal(resp)
+	if err != nil {
+		log.Println("marshalling response error:", err)
+		http.Error(w, "can't marshal response", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json;charset=utf-8")
+	w.WriteHeader(http.StatusOK)
+	w.Write(jsonResp)
+}

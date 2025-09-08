@@ -12,6 +12,6 @@ func setupRouter(r chi.Router, c Controller) {
 		r.Put("/api/v1/subscription", c.Update)
 		r.Delete("/api/v1/subscription/{id}", c.Delete)
 		r.Get("/api/v1/subscription", c.List)
-		r.Get("/api/v1/subscription/user/{id}/total", c.GetTotal)
+		r.Get("/api/v1/subscription/total", c.GetTotal)
 	})
 }
