@@ -1,0 +1,55 @@
+version: '3'
+
+services:
+  # subscription:
+  #   build: subscription
+  #   container_name: subscription
+  #   depends_on:
+  #     - db
+  #   networks:
+  #     - mylocal
+
+  db:
+    container_name: db
+    image: postgres:alpine
+    ports:
+      - "5432:5432"
+    env_file:
+      - ./.env # load environment variables from the file
+    networks:
+      - mylocal
+
+  # swagger-ui-auth:
+  #   image: swaggerapi/swagger-ui
+  #   container_name: swagger_ui_auth
+  #   environment:
+  #     SWAGGER_JSON: /app/swagger.json
+  #   volumes:
+  #     # монтируем swagger.json для доступа внутри контейнера
+  #     - ./auth/internal/docs/swagger.json:/app/swagger.json
+  #   networks:
+  #     - mylocal
+
+  # swagger-ui-geo:
+  #   image: swaggerapi/swagger-ui
+  #   container_name: swagger_ui_geo
+  #   environment:
+  #     SWAGGER_JSON: /app/swagger.json
+  #   volumes:
+  #     - ./geo/internal/docs/swagger.json:/app/swagger.json
+  #   networks:
+  #     - mylocal
+
+  # swagger-ui-user:
+  #   image: swaggerapi/swagger-ui
+  #   container_name: swagger_ui_user
+  #   environment:
+  #     SWAGGER_JSON: /app/swagger.json
+  #   volumes:
+  #     - ./user/internal/docs/swagger.json:/app/swagger.json
+  #   networks:
+  #     - mylocal
+
+networks:
+  mylocal:
+    driver: bridge
