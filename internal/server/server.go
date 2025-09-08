@@ -5,7 +5,9 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
 	"subscribe_service/internal/config"
+	"syscall"
 	"time"
 
 	"github.com/go-chi/chi/v5"
@@ -30,18 +32,20 @@ func NewServer(cfg *config.Config, c Controller) *Server {
 	r := chi.NewRouter()
 	setupRouter(r, c)
 
-	return &Server{
+	s := &Server{
 		httpServer: &http.Server{
 			Addr:         ":" + cfg.HttpServerPort,
 			Handler:      r, // обработчик запросов
 			ReadTimeout:  10 * time.Second,
 			WriteTimeout: 10 * time.Second,
 		},
+		sigCh: make(chan os.Signal, 1),
 	}
+	signal.Notify(s.sigCh, os.Interrupt, syscall.SIGTERM)
+	return s
 }
 
 func (s *Server) Serve() {
-	// Запуск сервера в отдельной горутине
 	go func() {
 		log.Println("Start subscribe service server...")
 		if err := s.httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
@@ -49,18 +53,16 @@ func (s *Server) Serve() {
 		}
 	}()
 
-	// Ожидание сигнала остановки
 	sig := <-s.sigCh
 	log.Printf("Received signal: %s\n", sig)
+	s.ShutdownGracefully()
 }
 
 // shutdownGracefully аккуратно останавливает сервер
 func (s *Server) ShutdownGracefully() {
-	// Создание контекста с таймаутом для graceful shutdown
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	// Остановка сервера с использованием graceful shutdown
 	if err := s.httpServer.Shutdown(ctx); err != nil {
 		log.Fatalf("Server forced to shutdown: %v", err)
 	}

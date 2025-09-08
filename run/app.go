@@ -7,8 +7,7 @@ import (
 )
 
 type app struct {
-	cfg *config.Config
-	// db         repository.Repository
+	cfg        *config.Config
 	httpServer *server.Server
 }
 
@@ -22,5 +21,4 @@ func NewApp(cfg *config.Config) *app {
 
 func (a *app) Run() {
 	a.httpServer.Serve()
-	a.httpServer.ShutdownGracefully()
 }
