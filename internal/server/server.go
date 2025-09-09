@@ -21,6 +21,8 @@ type Controller interface {
 	List(w http.ResponseWriter, r *http.Request)
 
 	GetTotal(w http.ResponseWriter, r *http.Request)
+
+	Swagger(w http.ResponseWriter, r *http.Request)
 }
 
 type Server struct {

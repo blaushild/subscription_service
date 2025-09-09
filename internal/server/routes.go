@@ -14,4 +14,6 @@ func setupRouter(r chi.Router, c Controller) {
 		r.Get("/api/v1/subscription", c.List)
 		r.Get("/api/v1/subscription/total", c.GetTotal)
 	})
+
+	r.Get("/swagger/*", c.Swagger)
 }
