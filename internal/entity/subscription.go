@@ -27,12 +27,12 @@ type TotalRequest struct {
 }
 
 type TotalResponse struct {
-	UserID      uuid.UUID
-	ServiceName string
-	Total       uint
-	Count       uint16
+	UserID      uuid.UUID `json:"user_id"`
+	ServiceName string    `json:"service_name"`
+	Total       uint      `json:"total"`
+	Count       uint16    `json:"count"`
 }
 
 type SubscriptionsResponse struct {
-	Subscriptions []*Subscription
+	Subscriptions []*Subscription `json:"subscriptions"`
 }

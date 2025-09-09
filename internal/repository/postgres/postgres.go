@@ -99,7 +99,6 @@ func (r *Repository) GetRecordByID(id uuid.UUID) (*entity.Subscription, error) {
 }
 
 func (r *Repository) Update(sub *entity.Subscription) (*entity.Subscription, error) {
-	// TODO: проверить текущую запись и перенести данные, которые не изменяем
 	q := `UPDATE subscriptions
 		SET user_id = :UserID,
 			start_date = :StartDate,
@@ -170,12 +169,17 @@ func (r *Repository) List() (*entity.SubscriptionsResponse, error) {
 }
 
 func (r *Repository) GetTotal(req *entity.TotalRequest) (*entity.TotalResponse, error) {
-	baseQuery := `SELECT COALESCE(SUM(price), 0) AS total, COUNT(id) AS count 
+	query := `SELECT COALESCE(SUM(price), 0) AS total, COUNT(id) AS count 
 			FROM subscriptions`
 
-	whereConditions := []string{"user_id = $1"}
-	args := []any{req.UserID}
-	paramCount := 1 // Start with 1 parameter for user_id
+	whereConditions := make([]string, 0, 4)
+	args := make([]any, 0, 4)
+	paramCount := 0
+	if req.UserID != uuid.Nil {
+		paramCount++
+		whereConditions = append(whereConditions, fmt.Sprintf("user_id = $%d", paramCount))
+		args = append(args, req.UserID)
+	}
 
 	if req.ServiceName != "" {
 		paramCount++
@@ -195,12 +199,12 @@ func (r *Repository) GetTotal(req *entity.TotalRequest) (*entity.TotalResponse, 
 		args = append(args, time.Time(*req.FinishDate))
 	}
 
-	finalQuery := baseQuery + " WHERE " + strings.Join(whereConditions, " AND ")
-
-	log.Println("finalQuery", finalQuery, req.FinishDate)
+	if paramCount > 0 {
+		query = query + " WHERE " + strings.Join(whereConditions, " AND ")
+	}
 
 	var resp entity.TotalResponse
-	err := r.db.Get(&resp, finalQuery, args...)
+	err := r.db.Get(&resp, query, args...)
 	if err != nil {
 		log.Printf("db GetTotal query error: %s\n", err)
 		return nil, fmt.Errorf("db GetTotal query error: %w", err)

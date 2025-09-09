@@ -76,19 +76,21 @@ func (c *controller) GetRecordByID(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
 	id, err := uuid.Parse(idStr)
 	if err != nil {
+		log.Printf("Invalid ID format: %s. Error: %s\n", idStr, err)
 		http.Error(w, "Invalid ID format", http.StatusBadRequest)
 		return
 	}
 
 	resp, err := c.service.GetRecordByID(id)
 	if err != nil {
-		log.Printf("failed to get record: %s\n", err)
+		log.Printf("Failed to get record: %s. id: %s\n", err, id)
 		http.Error(w, "Failed to get record", http.StatusInternalServerError)
 		return
 	}
 
 	data, err := json.Marshal(resp)
 	if err != nil {
+		log.Println("marshalling error:", err)
 		http.Error(w, "Failed to marshal response", http.StatusInternalServerError)
 		return
 	}
@@ -136,6 +138,7 @@ func (c *controller) Delete(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
 	id, err := uuid.Parse(idStr)
 	if err != nil {
+		log.Printf("Invalid ID format: %s. Error: %s\n", idStr, err)
 		http.Error(w, "Invalid ID format", http.StatusBadRequest)
 		return
 	}
@@ -159,6 +162,8 @@ func (c *controller) List(w http.ResponseWriter, r *http.Request) {
 	resp, err := c.service.GetList()
 	if err != nil {
 		log.Printf("List error: %s", err)
+		http.Error(w, "Getting list error.", http.StatusInternalServerError)
+		return
 	}
 
 	data, err := json.Marshal(resp)
