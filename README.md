@@ -19,7 +19,6 @@
     ```bash
     ./build.sh
     ```
-    Эта команда выполнит `docker-compose up --force-recreate --build`.
 
 ## Эндпоинты API
 
