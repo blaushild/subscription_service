@@ -164,6 +164,15 @@ const docTemplate = `{
                     "subscription"
                 ],
                 "summary": "Получение данных о подписке",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Subscription ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",

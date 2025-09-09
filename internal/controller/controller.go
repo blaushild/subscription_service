@@ -41,7 +41,7 @@ func NewController(cfg *config.Config) *controller {
 //
 // @Summary      Создание новой подписки
 // @Description  Создание новой подписки
-// @Tags       	subscription
+// @Tags       	 subscription
 // @Accept       json
 // @Produce		 json
 // @Param        request  body  entity.CreateRequest  true  "DataForCreate"
@@ -90,7 +90,7 @@ func (c *controller) Create(w http.ResponseWriter, r *http.Request) {
 // @Description Получение данных о подписке
 // @Tags       	subscription
 // @Produce		json
-// @Param      	request  path  uuid.UUID  true  "Subscription ID"
+// @Param        id   path      string  true  "Subscription ID"
 // @Success    	200  {object} entity.Subscription
 // @Failure    	400
 // @Failure    	500
@@ -126,7 +126,7 @@ func (c *controller) GetRecordByID(w http.ResponseWriter, r *http.Request) {
 //
 // @Summary      Обновление данных подписки
 // @Description  Обновление данных подписки
-// @Tags       	subscription
+// @Tags       	 subscription
 // @Accept       json
 // @Produce      json
 // @Param        request  body  entity.Subscription  true  "Data for update"
@@ -173,7 +173,7 @@ func (c *controller) Update(w http.ResponseWriter, r *http.Request) {
 //
 // @Summary      Удаление подписки
 // @Description  Удаление подписки по ID
-// @Tags       	subscription
+// @Tags       	 subscription
 // @Param        id   path      string  true  "Subscription ID"
 // @Success      204
 // @Failure      400
@@ -207,7 +207,7 @@ func (c *controller) Delete(w http.ResponseWriter, r *http.Request) {
 //
 // @Summary      Получение списка подписок
 // @Description  Получение списка всех подписок
-// @Tags       	subscription
+// @Tags       	 subscription
 // @Produce      json
 // @Success      200  {object} entity.SubscriptionsResponse
 // @Failure      500
@@ -234,7 +234,7 @@ func (c *controller) List(w http.ResponseWriter, r *http.Request) {
 //
 // @Summary      Получение общей стоимости и количества подписок
 // @Description  Получение общей стоимости и количества подписок с учётом фильтров.
-// @Tags       	total
+// @Tags       	 total
 // @Accept       json
 // @Produce      json
 // @Param        request  body  entity.TotalRequest  true  "Фильтры для статистики. Все поля опциональны"
