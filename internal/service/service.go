@@ -1,7 +1,6 @@
 package service
 
 import (
-	"fmt"
 	"subscribe_service/internal/config"
 	"subscribe_service/internal/entity"
 	repository "subscribe_service/internal/repository/postgres"
@@ -32,13 +31,7 @@ func (s *service) Create(req *entity.CreateRequest) (*entity.Subscription, error
 }
 
 func (s *service) GetRecordByID(id uuid.UUID) (*entity.Subscription, error) {
-
-	resp, err := s.repo.GetRecordByID(id)
-	if err != nil {
-		return nil, fmt.Errorf("GetRecordByID error: %w", err)
-	}
-
-	return resp, nil
+	return s.repo.GetRecordByID(id)
 }
 
 func (s *service) Update(req *entity.Subscription) (*entity.Subscription, error) {
@@ -56,10 +49,3 @@ func (s *service) GetList() (*entity.SubscriptionsResponse, error) {
 func (s *service) GetTotal(req *entity.TotalRequest) (*entity.TotalResponse, error) {
 	return s.repo.GetTotal(req)
 }
-
-//
-// 	Update(req *entity.Subscription) (*entity.Subscription, error)
-// 	Delete(id uuid.UUID) error
-// 	GetList() (*entity.SubscriptionsResponse, error)
-
-// 	GetTotal(req entity.TotalRequst) (entity.TotalResponse, error)
