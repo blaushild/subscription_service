@@ -1,0 +1,192 @@
+basePath: /api/v1/subscription
+definitions:
+  entity.CreateRequest:
+    properties:
+      finish_date:
+        type: string
+      price:
+        type: integer
+      service_name:
+        type: string
+      start_date:
+        type: string
+      user_id:
+        type: string
+    type: object
+  entity.Subscription:
+    properties:
+      finish_date:
+        type: string
+      id:
+        type: string
+      price:
+        type: integer
+      service_name:
+        type: string
+      start_date:
+        type: string
+      user_id:
+        type: string
+    type: object
+  entity.SubscriptionsResponse:
+    properties:
+      subscriptions:
+        items:
+          $ref: '#/definitions/entity.Subscription'
+        type: array
+    type: object
+  entity.TotalRequest:
+    properties:
+      finish_date:
+        type: string
+      service_name:
+        type: string
+      start_date:
+        type: string
+      user_id:
+        type: string
+    type: object
+  entity.TotalResponse:
+    properties:
+      count:
+        type: integer
+      service_name:
+        type: string
+      total:
+        type: integer
+      user_id:
+        type: string
+    type: object
+info:
+  contact: {}
+  description: This is a subscription service.
+  title: Subscription service API
+  version: 0.0.1
+paths:
+  /subscription:
+    get:
+      description: Получение списка всех подписок
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.SubscriptionsResponse'
+        "500":
+          description: Internal Server Error
+      summary: Получение списка подписок
+      tags:
+      - subscription
+    post:
+      consumes:
+      - application/json
+      description: Создание новой подписки
+      parameters:
+      - description: DataForCreate
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/entity.CreateRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/entity.Subscription'
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      summary: Создание новой подписки
+      tags:
+      - subscription
+    put:
+      consumes:
+      - application/json
+      description: Обновление данных подписки
+      parameters:
+      - description: Data for update
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Subscription'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Subscription'
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      summary: Обновление данных подписки
+      tags:
+      - subscription
+  /subscription/{id}:
+    delete:
+      description: Удаление подписки по ID
+      parameters:
+      - description: Subscription ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      summary: Удаление подписки
+      tags:
+      - subscription
+    get:
+      description: Получение данных о подписке
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Subscription'
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      summary: Получение данных о подписке
+      tags:
+      - subscription
+  /subscription/total:
+    get:
+      consumes:
+      - application/json
+      description: Получение общей стоимости и количества подписок с учётом фильтров.
+      parameters:
+      - description: Фильтры для статистики. Все поля опциональны
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/entity.TotalRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.TotalResponse'
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      summary: Получение общей стоимости и количества подписок
+      tags:
+      - total
+swagger: "2.0"

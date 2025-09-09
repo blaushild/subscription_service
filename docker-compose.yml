@@ -19,36 +19,18 @@ services:
     networks:
       - mylocal
 
-  # swagger-ui-auth:
-  #   image: swaggerapi/swagger-ui
-  #   container_name: swagger_ui_auth
-  #   environment:
-  #     SWAGGER_JSON: /app/swagger.json
-  #   volumes:
-  #     # монтируем swagger.json для доступа внутри контейнера
-  #     - ./auth/internal/docs/swagger.json:/app/swagger.json
-  #   networks:
-  #     - mylocal
-
-  # swagger-ui-geo:
-  #   image: swaggerapi/swagger-ui
-  #   container_name: swagger_ui_geo
-  #   environment:
-  #     SWAGGER_JSON: /app/swagger.json
-  #   volumes:
-  #     - ./geo/internal/docs/swagger.json:/app/swagger.json
-  #   networks:
-  #     - mylocal
-
-  # swagger-ui-user:
-  #   image: swaggerapi/swagger-ui
-  #   container_name: swagger_ui_user
-  #   environment:
-  #     SWAGGER_JSON: /app/swagger.json
-  #   volumes:
-  #     - ./user/internal/docs/swagger.json:/app/swagger.json
-  #   networks:
-  #     - mylocal
+  swagger-ui:
+    image: swaggerapi/swagger-ui
+    container_name: swagger_ui
+    ports:
+      - "8081:8080"
+    environment:
+      SWAGGER_JSON: /app/swagger.json
+    volumes:
+      # монтируем swagger.json для доступа внутри контейнера
+      - ./internal/docs/swagger.json:/app/swagger.json
+    networks:
+      - mylocal
 
 networks:
   mylocal:

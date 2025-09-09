@@ -37,6 +37,18 @@ func NewController(cfg *config.Config) *controller {
 	}
 }
 
+// Create создаёт новую подписку
+//
+// @Summary      Создание новой подписки
+// @Description  Создание новой подписки
+// @Tags       	subscription
+// @Accept       json
+// @Produce		 json
+// @Param        request  body  entity.CreateRequest  true  "DataForCreate"
+// @Success      201  {object} entity.Subscription
+// @Failure      400
+// @Failure      500
+// @Router       /subscription [post]
 func (c *controller) Create(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
@@ -72,6 +84,17 @@ func (c *controller) Create(w http.ResponseWriter, r *http.Request) {
 	w.Write(jsonResp)
 }
 
+// GetRecordByID возвращает данные подписки по ID
+//
+// @Summary     Получение данных о подписке
+// @Description Получение данных о подписке
+// @Tags       	subscription
+// @Produce		json
+// @Param      	request  path  uuid.UUID  true  "Subscription ID"
+// @Success    	200  {object} entity.Subscription
+// @Failure    	400
+// @Failure    	500
+// @Router     	/subscription/{id} [get]
 func (c *controller) GetRecordByID(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
 	id, err := uuid.Parse(idStr)
@@ -99,6 +122,18 @@ func (c *controller) GetRecordByID(w http.ResponseWriter, r *http.Request) {
 	w.Write(data)
 }
 
+// Update обновляет данные подписки
+//
+// @Summary      Обновление данных подписки
+// @Description  Обновление данных подписки
+// @Tags       	subscription
+// @Accept       json
+// @Produce      json
+// @Param        request  body  entity.Subscription  true  "Data for update"
+// @Success      200  {object} entity.Subscription
+// @Failure      400
+// @Failure      500
+// @Router       /subscription [put]
 func (c *controller) Update(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
@@ -134,6 +169,16 @@ func (c *controller) Update(w http.ResponseWriter, r *http.Request) {
 	w.Write(jsonResp)
 }
 
+// Delete удаляет подписку по ID
+//
+// @Summary      Удаление подписки
+// @Description  Удаление подписки по ID
+// @Tags       	subscription
+// @Param        id   path      string  true  "Subscription ID"
+// @Success      204
+// @Failure      400
+// @Failure      500
+// @Router       /subscription/{id} [delete]
 func (c *controller) Delete(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
 	id, err := uuid.Parse(idStr)
@@ -158,6 +203,15 @@ func (c *controller) Delete(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
+// List возвращает список всех подписок
+//
+// @Summary      Получение списка подписок
+// @Description  Получение списка всех подписок
+// @Tags       	subscription
+// @Produce      json
+// @Success      200  {object} entity.SubscriptionsResponse
+// @Failure      500
+// @Router       /subscription [get]
 func (c *controller) List(w http.ResponseWriter, r *http.Request) {
 	resp, err := c.service.GetList()
 	if err != nil {
@@ -176,6 +230,18 @@ func (c *controller) List(w http.ResponseWriter, r *http.Request) {
 	w.Write(data)
 }
 
+// GetTotal возвращает общую стоимость и количество подписок
+//
+// @Summary      Получение общей стоимости и количества подписок
+// @Description  Получение общей стоимости и количества подписок с учётом фильтров.
+// @Tags       	total
+// @Accept       json
+// @Produce      json
+// @Param        request  body  entity.TotalRequest  true  "Фильтры для статистики. Все поля опциональны"
+// @Success      200  {object} entity.TotalResponse
+// @Failure      400
+// @Failure      500
+// @Router       /subscription/total [get]
 func (c *controller) GetTotal(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
